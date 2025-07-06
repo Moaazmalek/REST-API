@@ -12,16 +12,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OrderServices = void 0;
-const order_model_1 = __importDefault(require("./order.model"));
-const createANewOrder = (data) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield order_model_1.default.create(data);
+exports.UserServices = void 0;
+const user_model_1 = __importDefault(require("./user.model"));
+const bcrypt_1 = __importDefault(require("bcrypt"));
+const findUserByEmail = (email) => __awaiter(void 0, void 0, void 0, function* () {
+    return user_model_1.default.findOne({ email: email });
 });
-const getAllOrdersFromDB = (query) => __awaiter(void 0, void 0, void 0, function* () {
-    const filter = query ? { email: query } : {};
-    return yield order_model_1.default.find(filter);
+const createUser = (email, password, role) => __awaiter(void 0, void 0, void 0, function* () {
+    const hashedPassword = yield bcrypt_1.default.hash(password, 10);
+    const user = yield new user_model_1.default({ email, password: hashedPassword, role });
+    return yield user.save();
 });
-exports.OrderServices = {
-    createANewOrder,
-    getAllOrdersFromDB
+const validatePassword = (inputPassword, userPassword) => __awaiter(void 0, void 0, void 0, function* () {
+    return bcrypt_1.default.compare(inputPassword, userPassword);
+});
+exports.UserServices = {
+    findUserByEmail,
+    createUser,
+    validatePassword
 };
